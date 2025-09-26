@@ -1,5 +1,6 @@
 const FormModel = require("../models/FormModel.js");
 const xlsx = require("xlsx");
+const path = require("path");
 
 const createForm = async ({
   reportType,
@@ -190,21 +191,34 @@ const getLocationCounts = async () => {
 };
 
 const getExcel = async (req, res) => {
-  //Lấy đường dẫn file excel
-  const excelPath = "D:\\Intern\\Medical_Report\\BE\\public\\DS_KHoaPHòng.xlsx";
-  console.log("excelPath", excelPath);
+  try {
+    // Tạo đường dẫn tuyệt đối tới file Excel
+    const excelPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "public",
+      "DS_KHoaPHòng.xlsx"
+    );
+    console.log("excelPath", excelPath);
 
-  // đọc file excel
-  const workbook = xlsx.readFile(excelPath);
-  console.log("workbook", workbook);
-  const sheetName = workbook.SheetNames[0]; // lấy sheet đầu tiên
-  const sheet = workbook.Sheets[sheetName];
-  const results = xlsx.utils.sheet_to_json(sheet, { header: 1 }); // chuyển sang JSON
+    // Đọc file excel
+    const workbook = xlsx.readFile(excelPath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const results = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
-  return {
-    success: true,
-    data: results,
-  };
+    return {
+      success: true,
+      data: results,
+    };
+  } catch (error) {
+    console.error("Lỗi khi đọc Excel:", error);
+    return {
+      success: false,
+      message: "Không thể đọc file Excel",
+    };
+  }
 };
 
 module.exports = {
